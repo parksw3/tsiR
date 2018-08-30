@@ -36,24 +36,29 @@
 #' \dontrun{
 #' plotdata(London)
 #' res <- runtsir(data=London,method='pois',nsim=10, IP=2,inits.fit=FALSE)
-#'plotres(res)
-#'}
-runtsir <- function(data, xreg = 'cumcases',
-                    IP = 2,nsim = 10,
-                    regtype = 'gaussian',sigmamax = 3,
+#' plotres(res)
+#' }
+runtsir <- function(data,
+					xreg=c('cumcases','cumbirths'),
+                    IP = 2,
+					nsim = 10,
+                    regtype=c('gaussian','lm','spline','lowess','loess','user'),
+					sigmamax = 3,
                     userYhat = numeric(),alpha=NULL,sbar=NULL,
-                    family='gaussian',link='identity',
-                    method='deterministic',
+                    family='gaussian',
+					link=c('log','identity'),
+                    method=c('deterministic','negbin','pois'),
                     inits.fit=FALSE,
-                    epidemics='cont', pred ='forward',
-                    threshold=1,seasonality='standard',
-                    add.noise.sd = 0, mul.noise.sd = 0,
-                    printon=F,fit = NULL,fittype = NULL){
-
-
-  if( (nsim %% 1 ==0) == F){
-    nsim <- round(nsim)
-  }
+                    epidemics=c('cont','break'),
+					pred=c('forward','step-ahead'),
+                    threshold=1,
+					seasonality=c('standard','schoolterm','none'),
+                    add.noise.sd = 0,
+					mul.noise.sd = 0,
+                    printon=FALSE,
+					fit = NULL,
+					fittype = NULL){
+  nsim <- round(nsim)
 
   datacheck <- c('time','cases','pop','births')
   if(sum(datacheck %in% names(data)) < length(datacheck)){
@@ -70,48 +75,19 @@ runtsir <- function(data, xreg = 'cumcases',
     stop('there cannot be any NAs in the births vector -- please correct')
   }
 
-  xregcheck <- c('cumcases','cumbirths')
-  if(xreg %in% xregcheck == F){
-    stop('xreg must be either "cumcases" or "cumbirths"')
-  }
-
-  regtypecheck <- c('gaussian','lm','spline','lowess','loess','user')
-  if(regtype %in% regtypecheck == F){
-    stop("regtype must be one of 'gaussian','lm','spline','lowess','loess','user'")
-  }
-
   if(length(sbar) == 1){
     if(sbar > 1 || sbar < 0){
       stop("sbar must be a percentage of the population, i.e. between zero and one.")
     }
   }
 
-  linkcheck <- c('log','identity')
-  if(link %in% linkcheck == F){
-    stop("link must be either 'log' or 'identity'")
-  }
-
-
-  seasonalitycheck <- c('standard','schoolterm','none')
-  if(seasonality %in% seasonalitycheck == F){
-    stop("seasonality must be either 'standard' or 'schoolterm' or 'none'")
-  }
-
-  methodcheck <- c('deterministic','negbin','pois')
-  if(method %in% methodcheck == F){
-    stop("method must be one of 'deterministic','negbin','pois'")
-  }
-
-  epidemicscheck <- c('cont','break')
-  if(epidemics %in% epidemicscheck == F){
-    stop("epidemics must be either 'cont' or 'break'")
-  }
-
-  predcheck <- c('forward','step-ahead')
-  if(pred %in% predcheck == F){
-    stop("pred must be either 'forward' or 'step-ahead'")
-  }
-
+  xreg <- match.arg(xreg)
+  regtype <- match.arg(regtype)
+  link <- match.arg(link)
+  seasonality <- match.arg(seasonality)
+  method <- match.arg(method)
+  epidemics <- match.arg(epidemics)
+  pred <- match.arg(pred)
 
   if(length(fittype) == 1){
     warning('Argument fittype is deprecated;
@@ -130,7 +106,6 @@ runtsir <- function(data, xreg = 'cumcases',
     stop('Argument fit is deprecated; the only fit option here is using a glm.
          Please use mcmctsir for an mcmc version of the tsir model.')
   }
-
 
   input.alpha <- alpha
   input.sbar <- sbar
@@ -295,6 +270,7 @@ runtsir <- function(data, xreg = 'cumcases',
   if(link == 'identity'){
     Inew <- log(Inew)
   }
+
   Inew <- round(Inew)
 
   if(length(input.alpha) == 0 && length(input.sbar) == 0){
