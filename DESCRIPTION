@@ -13,6 +13,7 @@ Imports:
     ggplot2,
     kernlab,
     reshape2,
-    grid
+    grid,
+    MASS
 Contact: adbecker at princeton dot edu
 RoxygenNote: 6.1.0.9000

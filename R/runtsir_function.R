@@ -30,6 +30,7 @@
 #' @param fit Now removed but gives a warning.
 #' @param fittype Now removed but gives a warning.
 #' @param inits.fit Whether or not to fit initial conditions using simple least squares as well. Defaults to FALSE. This parameter is more necessary in more chaotic locations.
+#' @importFrom MASS glm.nb
 #' @examples
 #' require(kernlab)
 #' London <- twentymeas[["London"]]
@@ -46,7 +47,7 @@ runtsir <- function(data,
 					sigmamax = 3,
                     userYhat = numeric(),alpha=NULL,sbar=NULL,
                     family='gaussian',
-					link=c('log','identity'),
+					link=c('identity', 'log'),
                     method=c('deterministic','negbin','pois'),
                     inits.fit=FALSE,
                     epidemics=c('cont','break'),
@@ -273,13 +274,29 @@ runtsir <- function(data,
 
   Inew <- round(Inew)
 
+  if (family=="nbinom") {
+  	glmfun <- function(formula, family, link) {
+  		if (link=="log") {
+  			glm.nb(formula=formula, link=log)
+  		} else {
+  			glm.nb(formula=formula, link=identity)
+  		}
+
+  	}
+  } else {
+  	glmfun <- function(formula, family, link) {
+  		glm(formula=formula, family=eval(parse(text=family))(link=link))
+  	}
+  }
+
   if(length(input.alpha) == 0 && length(input.sbar) == 0){
 
     for(i in 1:length(Smean)){
       lSminus <- log(Smean[i] + Zminus)
 
-      glmfit <- glm(Inew ~ -1 +as.factor(period) + (lIminus) + offset(lSminus),
-                    family=eval(parse(text=family))(link=link))
+      glmfit <- glmfun(Inew ~ -1 +as.factor(period) + (lIminus) + offset(lSminus),
+      				   family=family,
+      				   link=link)
 
       loglik[i] <- glmfit$deviance
 
@@ -289,9 +306,9 @@ runtsir <- function(data,
 
     lSminus <- log(sbar + Zminus)
 
-    glmfit <- glm(Inew ~ -1 +as.factor(period)+ (lIminus) + offset(lSminus),
-                  family=eval(parse(text=family))(link=link))
-
+    glmfit <- glmfun(Inew ~ -1 +as.factor(period) + (lIminus) + offset(lSminus),
+    				 family=family,
+    				 link=link)
 
     beta <- exp(head(coef(glmfit),-1))
     alpha <- tail(coef(glmfit),1)
@@ -304,9 +321,9 @@ runtsir <- function(data,
     for(i in 1:length(Smean)){
       lSminus <- log(Smean[i] + Zminus)
 
-      glmfit <- glm(Inew ~ -1 +as.factor(period) + offset(alpha*lIminus) + offset(lSminus),
-                    family=eval(parse(text=family))(link=link))
-
+      glmfit <- glmfun(Inew ~ -1 +as.factor(period) + offset(alpha*lIminus) + offset(lSminus),
+      				 family=family,
+      				 link=link)
 
       loglik[i] <- glmfit$deviance
 
@@ -316,8 +333,9 @@ runtsir <- function(data,
 
     lSminus <- log(sbar + Zminus)
 
-    glmfit <- glm(Inew ~ -1 +as.factor(period)+ offset(alpha*lIminus) + offset(lSminus),
-                  family=eval(parse(text=family))(link=link))
+    glmfit <- glmfun(Inew ~ -1 +as.factor(period) + offset(alpha*lIminus) + offset(lSminus),
+    				 family=family,
+    				 link=link)
 
 
     beta <- exp(coef(glmfit))
@@ -330,8 +348,9 @@ runtsir <- function(data,
     lSminus <- log(sbar + Zminus)
 
 
-    glmfit <- glm(Inew ~ -1 +as.factor(period) + (lIminus) + offset(lSminus),
-                  family=eval(parse(text=family))(link=link))
+    glmfit <- glmfun(Inew ~ -1 +as.factor(period) + (lIminus) + offset(lSminus),
+    				 family=family,
+    				 link=link)
 
 
     beta <- exp(head(coef(glmfit),-1))
@@ -344,8 +363,9 @@ runtsir <- function(data,
     sbar <- sbar * mean(pop)
     lSminus <- log(sbar + Zminus)
 
-    glmfit <- glm(Inew ~ -1 +as.factor(period)+ offset(alpha*lIminus) + offset(lSminus),
-                  family=eval(parse(text=family))(link=link))
+    glmfit <- glmfun(Inew ~ -1 +as.factor(period) + offset(alpha*lIminus) + offset(lSminus),
+    				 family=family,
+    				 link=link)
 
     beta <- exp(coef(glmfit))
 
@@ -536,3 +556,6 @@ runtsir <- function(data,
 
 
 }
+
+
+

@@ -9,3 +9,4 @@ importFrom("stats", "approx", "approxfun", "coef", "confint",
 importFrom("utils", "head", "installed.packages", "tail")
 importFrom("kernlab","gausspr","predict")
 importFrom("stats","AIC")
+importFrom("MASS","glm.nb")
