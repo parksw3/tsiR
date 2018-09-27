@@ -2,6 +2,7 @@ exportPattern("^[^\\.]")
 import("ggplot2")
 importFrom("grid","grid.newpage","pushViewport","viewport","grid.layout")
 import("reshape2")
+import("MASS")
 importFrom("stats", "approx", "approxfun", "coef", "confint",
              "gaussian", "glm", "lm", "loess", "lowess", "model.matrix",
              "poisson", "predict", "qt", "quantile", "rnbinom", "rnorm",
@@ -9,4 +10,3 @@ importFrom("stats", "approx", "approxfun", "coef", "confint",
 importFrom("utils", "head", "installed.packages", "tail")
 importFrom("kernlab","gausspr","predict")
 importFrom("stats","AIC")
-importFrom("MASS","glm.nb")

@@ -30,7 +30,6 @@
 #' @param fit Now removed but gives a warning.
 #' @param fittype Now removed but gives a warning.
 #' @param inits.fit Whether or not to fit initial conditions using simple least squares as well. Defaults to FALSE. This parameter is more necessary in more chaotic locations.
-#' @importFrom MASS glm.nb
 #' @examples
 #' require(kernlab)
 #' London <- twentymeas[["London"]]
@@ -270,9 +269,9 @@ runtsir <- function(data,
 
   if(link == 'identity'){
     Inew <- log(Inew)
+  } else {
+  	Inew <- round(Inew)
   }
-
-  Inew <- round(Inew)
 
   if (family=="nbinom") {
   	glmfun <- function(formula, family, link) {
@@ -298,11 +297,10 @@ runtsir <- function(data,
       				   family=family,
       				   link=link)
 
-      loglik[i] <- glmfit$deviance
-
+      loglik[i] <- logLik(glmfit)
     }
 
-    sbar <- Smean[which.min(loglik)]
+    sbar <- Smean[which.max(loglik)]
 
     lSminus <- log(sbar + Zminus)
 
@@ -325,11 +323,11 @@ runtsir <- function(data,
       				 family=family,
       				 link=link)
 
-      loglik[i] <- glmfit$deviance
+      loglik[i] <- logLik(glmfit)
 
     }
 
-    sbar <- Smean[which.min(loglik)]
+    sbar <- Smean[which.max(loglik)]
 
     lSminus <- log(sbar + Zminus)
 
@@ -553,6 +551,4 @@ runtsir <- function(data,
               'nsim'=nsim,'rsquared'=rsquared,
               'inits.fit'=inits.fit,
               'inits.grid'=inits.grid,'inits'=IC))
-
-
 }
