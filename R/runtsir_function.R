@@ -40,25 +40,25 @@
 #' plotres(res)
 #' }
 runtsir <- function(data,
-					xreg=c('cumcases','cumbirths'),
+                    xreg=c('cumcases','cumbirths'),
                     IP = 2,
-					nsim = 10,
+                    nsim = 10,
                     regtype=c('gaussian','lm','spline','lowess','loess','user'),
-					sigmamax = 3,
+                    sigmamax = 3,
                     userYhat = numeric(),alpha=NULL,sbar=NULL,
                     family='gaussian',
-					link=c('identity', 'log'),
+                    link=c('identity', 'log'),
                     method=c('deterministic','negbin','pois'),
                     inits.fit=FALSE,
                     epidemics=c('cont','break'),
-					pred=c('forward','step-ahead'),
+                    pred=c('forward','step-ahead'),
                     threshold=1,
-					seasonality=c('standard','schoolterm','none'),
+                    seasonality=c('standard','schoolterm','none'),
                     add.noise.sd = 0,
-					mul.noise.sd = 0,
+                    mul.noise.sd = 0,
                     printon=FALSE,
-					fit = NULL,
-					fittype = NULL){
+                    fit = NULL,
+                    fittype = NULL){
   nsim <- round(nsim)
 
   datacheck <- c('time','cases','pop','births')
@@ -556,6 +556,3 @@ runtsir <- function(data,
 
 
 }
-
-
-
