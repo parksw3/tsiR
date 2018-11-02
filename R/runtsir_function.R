@@ -57,7 +57,8 @@ runtsir <- function(data,
                     mul.noise.sd = 0,
                     printon=FALSE,
                     fit = NULL,
-                    fittype = NULL){
+                    fittype = NULL,
+					Smean){
   nsim <- round(nsim)
 
   datacheck <- c('time','cases','pop','births')
@@ -262,8 +263,12 @@ runtsir <- function(data,
 
   pop <- data$pop
 
-  minSmean <- max(0.01*pop,-(min(Z)+1))
-  Smean <- seq(minSmean, 0.4*mean(pop), length=250)
+  if (missing(Smean)) {
+  	minSmean <- max(0.01*pop,-(min(Z))+1)
+  	Smean <- seq(minSmean, 0.4*mean(pop), length=250)
+  }
+
+
 
   loglik <- rep(NA, length(Smean))
 
