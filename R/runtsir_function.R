@@ -58,7 +58,8 @@ runtsir <- function(data,
                     printon=FALSE,
                     fit = NULL,
                     fittype = NULL,
-					Smean){
+					Smean,
+					nsample=30){
   nsim <- round(nsim)
 
   datacheck <- c('time','cases','pop','births')
@@ -397,11 +398,9 @@ runtsir <- function(data,
   S <- rep(0,length(data$cases))
   I <- rep(0,length(data$cases))
 
-  nsample <- 30
-
   inits.grid <- expand.grid(
     S0 = seq(0.01*mean(pop), 0.1*mean(pop), length=nsample),
-    I0 = seq(0.01*1e-3*mean(pop), 1*1e-3*mean(pop), length=nsample)
+    I0 = seq(0.01*1e-3*mean(pop), 1*2e-3*mean(pop), length=nsample)
   )
 
   if(inits.fit == TRUE){
